@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ItemType {
+  ASSIGNMENT
+  RESOURCE
+  TOOL
+  SYLLABUS_LANGUAGE
+  TEMPLATE
+  CASE_STUDY
+  TOOLKIT
+}
+
+enum ReviewerRole {
+  DISCIPLINARY_EXPERT
+  ETHICIST
+  PRIVACY_SPECIALIST
+  LEARNING_SCIENTIST
+  TECHNICAL_EXPERT
+  RESEARCHER
+  OTHER
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  department    String?
+  title         String?
+
+  isCtlStaff Boolean   @default(false)
+
+  accounts Account[]
+  sessions Session[]
+  items    Item[]
+  reviews  Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Item {
+  id           String   @id @default(cuid())
+  title        String
+  description  String   @db.Text
+  type         ItemType
+  authorId     String
+  fileUrl      String?
+  fileKey      String?
+  externalLink String?
+  published      Boolean   @default(true)
+  lastReviewedAt DateTime?
+
+  author  User     @relation(fields: [authorId], references: [id])
+  tags    Tag[]    @relation("ItemTags")
+  reviews Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([type])
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  items Item[] @relation("ItemTags")
+}
+
+model Review {
+  id              String       @id @default(cuid())
+  itemId          String
+  reviewerId      String
+  role            ReviewerRole
+  studentAgency   Int
+  biasMitigation  Int
+  dataSecurity    Int
+  accessibility   Int
+  studentLearning Int
+  comment         String?      @db.Text
+
+  item     Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  reviewer User @relation(fields: [reviewerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([itemId, reviewerId])
+  @@index([reviewerId])
+  @@index([itemId])
+}
