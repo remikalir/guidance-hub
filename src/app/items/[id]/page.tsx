@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { formatDate, ITEM_TYPE_LABELS, GUIDANCE_TYPES } from "@/lib/utils"
 import { ItemTypeBadge } from "@/components/items/ItemTypeBadge"
+import { ItemAdminControls } from "@/components/items/ItemAdminControls"
 import { ScoreSummary } from "@/components/reviews/ScoreSummary"
 import { ReviewCard } from "@/components/reviews/ReviewCard"
 import { ReviewForm } from "@/components/reviews/ReviewForm"
@@ -59,6 +60,12 @@ export default async function ItemDetailPage({
 
   const isGuidance = (GUIDANCE_TYPES as string[]).includes(item.type)
   const isAuthor = session?.user?.id === item.authorId
+  const isCtlStaff = session?.user?.isCtlStaff === true
+
+  // Unpublished items are visible only to the author and CTL staff.
+  // Everyone else sees a 404 so URLs don't leak existence of hidden content.
+  if (!item.published && !isAuthor && !isCtlStaff) notFound()
+
   const hasReviewed = session?.user?.id
     ? reviews.some((r) => r.reviewerId === session.user.id)
     : false
@@ -136,6 +143,16 @@ export default async function ItemDetailPage({
               </span>
             </div>
           </div>
+
+          {/* Unpublished banner — visible only to author/CTL staff who can see this item */}
+          {!item.published && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm">
+              <p className="font-semibold text-red-800">This item is unpublished.</p>
+              <p className="text-red-700 text-xs mt-1">
+                Only the author and CTL staff can see this page. It does not appear in browse results.
+              </p>
+            </div>
+          )}
 
           {/* Description */}
           <div className="bg-white border border-gray-200 rounded-xl p-6">
@@ -251,8 +268,8 @@ export default async function ItemDetailPage({
             />
           )}
 
-          {/* CTL badge — guidance items only */}
-          {isGuidance && (
+          {/* CTL Curated badge — for CTL-authored guidance content */}
+          {item.ctlCurated && (
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-semibold text-orange-800">CTL Curated</span>
@@ -261,6 +278,29 @@ export default async function ItemDetailPage({
                 This content has been vetted and published by the Duke Center for Teaching &amp; Learning.
               </p>
             </div>
+          )}
+
+          {/* CTL Endorsed badge — for community-submitted items recognized by CTL */}
+          {item.ctlEndorsed && (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-semibold text-green-800">CTL Endorsed</span>
+              </div>
+              <p className="text-xs text-green-700">
+                Recognized by the Duke Center for Teaching &amp; Learning as a valuable contribution from the community.
+              </p>
+            </div>
+          )}
+
+          {/* CTL staff admin controls */}
+          {isCtlStaff && (
+            <ItemAdminControls
+              itemId={item.id}
+              itemType={item.type}
+              published={item.published}
+              ctlCurated={item.ctlCurated}
+              ctlEndorsed={item.ctlEndorsed}
+            />
           )}
 
           <div className="bg-white border border-gray-200 rounded-xl p-5 text-sm text-gray-600 space-y-2">

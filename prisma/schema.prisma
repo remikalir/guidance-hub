@@ -94,6 +94,8 @@ model Item {
   fileKey      String?
   externalLink String?
   published      Boolean   @default(true)
+  ctlCurated     Boolean   @default(false)
+  ctlEndorsed    Boolean   @default(false)
   lastReviewedAt DateTime?
 
   author  User     @relation(fields: [authorId], references: [id])

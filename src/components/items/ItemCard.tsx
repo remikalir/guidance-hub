@@ -10,6 +10,8 @@ interface ItemCardProps {
     title: string
     description: string
     type: ItemType
+    ctlEndorsed?: boolean
+    ctlCurated?: boolean
     createdAt: Date | string
     author: { id: string; name: string | null; image: string | null }
     tags: { name: string }[]
@@ -47,7 +49,19 @@ export function ItemCard({ item }: ItemCardProps) {
     <Link href={`/items/${item.id}`} className="block group">
       <article className="bg-white border border-gray-200 rounded-xl p-5 h-full hover:shadow-md hover:border-duke-blue/30 transition-all">
         <div className="flex items-start justify-between gap-2 mb-3">
-          <ItemTypeBadge type={item.type} />
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <ItemTypeBadge type={item.type} />
+            {item.ctlEndorsed && (
+              <span className="px-2 py-0.5 bg-green-50 border border-green-200 text-green-800 text-xs font-semibold rounded-full">
+                CTL Endorsed
+              </span>
+            )}
+            {item.ctlCurated && (
+              <span className="px-2 py-0.5 bg-orange-50 border border-orange-200 text-orange-800 text-xs font-semibold rounded-full">
+                CTL Curated
+              </span>
+            )}
+          </div>
           {overall !== null && (
             <div className="flex items-center gap-1 shrink-0">
               <StarRating value={Math.round(overall)} readOnly size="sm" />
