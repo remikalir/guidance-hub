@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { ItemCard } from "@/components/items/ItemCard"
 import { ReviewCard } from "@/components/reviews/ReviewCard"
 import { EmptyState } from "@/components/ui/EmptyState"
+import { CtlStaffToggle } from "@/components/layout/CtlStaffToggle"
 import Link from "next/link"
 import { formatDate } from "@/lib/utils"
 
@@ -15,12 +16,19 @@ export default async function ProfilePage({
 }) {
   const { userId } = await params
   const session = await getServerSession(authOptions)
+  const viewerId = session?.user?.id
+  const viewerIsCtlStaff = session?.user?.isCtlStaff === true
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
       items: {
-        where: { published: true },
+        // Author sees their own unpublished items; CTL staff see all.
+        // Otherwise only published items are returned.
+        where:
+          viewerId === userId || viewerIsCtlStaff
+            ? {}
+            : { published: true },
         include: {
           author: { select: { id: true, name: true, image: true } },
           tags: { select: { name: true } },
@@ -49,7 +57,7 @@ export default async function ProfilePage({
 
   if (!user) notFound()
 
-  const isOwnProfile = session?.user?.id === userId
+  const isOwnProfile = viewerId === userId
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -68,7 +76,14 @@ export default async function ProfilePage({
           </div>
         )}
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">{user.name}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl font-bold text-gray-900">{user.name}</h1>
+            {user.isCtlStaff && (
+              <span className="px-2 py-0.5 bg-orange-50 border border-orange-200 text-orange-800 text-xs font-semibold rounded-full">
+                CTL Staff
+              </span>
+            )}
+          </div>
           {user.title && (
             <p className="text-gray-600 text-sm">{user.title}</p>
           )}
@@ -83,14 +98,19 @@ export default async function ProfilePage({
             <span>{user.reviews.length} reviews</span>
           </div>
         </div>
-        {isOwnProfile && (
-          <Link
-            href="/items/new"
-            className="shrink-0 bg-duke-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-duke-blue-dark transition-colors"
-          >
-            + Submit Item
-          </Link>
-        )}
+        <div className="shrink-0 flex flex-col items-end gap-2">
+          {isOwnProfile && (
+            <Link
+              href="/items/new"
+              className="bg-duke-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-duke-blue-dark transition-colors"
+            >
+              + Submit Item
+            </Link>
+          )}
+          {viewerIsCtlStaff && !isOwnProfile && (
+            <CtlStaffToggle userId={user.id} isCtlStaff={user.isCtlStaff} />
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

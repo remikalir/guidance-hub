@@ -48,11 +48,30 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) token.id = user.id
+      // Refresh isCtlStaff on every JWT use so promotion/demotion takes effect
+      // on the user's next request without requiring re-login.
+      if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { isCtlStaff: true },
+        })
+        token.isCtlStaff = dbUser?.isCtlStaff ?? false
+      }
       return token
     },
     async session({ session, token, user }) {
       if (session.user) {
         session.user.id = (token?.id ?? user?.id) as string
+        // In JWT strategy (dev), pull from token. In DB strategy (prod), look up fresh.
+        if (token?.isCtlStaff !== undefined) {
+          session.user.isCtlStaff = token.isCtlStaff
+        } else if (user?.id) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { isCtlStaff: true },
+          })
+          session.user.isCtlStaff = dbUser?.isCtlStaff ?? false
+        }
       }
       return session
     },
