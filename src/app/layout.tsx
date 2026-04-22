@@ -1,11 +1,24 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Playfair_Display, Roboto } from "next/font/google"
 import "./globals.css"
 import { SiteHeader } from "@/components/layout/SiteHeader"
 import { SiteFooter } from "@/components/layout/SiteFooter"
 import { Providers } from "./providers"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  style: ["normal", "italic"],
+  weight: ["400", "700"],
+  display: "swap",
+})
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  variable: "--font-roboto",
+  weight: ["400", "500", "700"],
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "Guidance Hub — Duke University AI & Education",
@@ -19,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-gray-50 antialiased font-sans">
+    <html lang="en" className={`${playfair.variable} ${roboto.variable} h-full`}>
+      <body className="min-h-full flex flex-col bg-paper antialiased font-sans">
         <Providers>
           <SiteHeader />
           <main className="flex-1">{children}</main>
