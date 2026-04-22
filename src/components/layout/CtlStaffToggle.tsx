@@ -1,3 +1,4 @@
+// src/components/layout/CtlStaffToggle.tsx — Phase 4c: token alignment
 "use client"
 
 import { useState, useTransition } from "react"
@@ -32,17 +33,17 @@ export function CtlStaffToggle({ userId, isCtlStaff: initial }: CtlStaffTogglePr
   }
 
   return (
-    <div>
+    <div className="flex flex-col items-end gap-1">
       <button
         type="button"
         onClick={toggle}
         disabled={isPending}
-        className="shrink-0 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-600 hover:border-duke-blue hover:text-duke-blue transition-colors disabled:opacity-50"
+        className="shrink-0 px-4 py-2 border border-rule rounded-full text-[13px] text-muted hover:border-duke-blue hover:text-duke-blue transition-colors disabled:opacity-50"
       >
         {isCtlStaff ? "Remove CTL staff" : "Promote to CTL staff"}
       </button>
       {error && (
-        <p className="text-xs text-red-600 mt-1">{error}</p>
+        <p className="text-[11px] text-red-600">{error}</p>
       )}
     </div>
   )

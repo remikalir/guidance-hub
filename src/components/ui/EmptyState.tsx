@@ -1,3 +1,4 @@
+// src/components/ui/EmptyState.tsx — Phase 4c: editorial typography, no emoji
 import { cn } from "@/lib/utils"
 
 interface EmptyStateProps {
@@ -11,16 +12,19 @@ export function EmptyState({ title, description, action, className }: EmptyState
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center text-center py-16 px-4",
+        "flex flex-col items-center justify-center text-center py-14 px-4",
         className
       )}
     >
-      <div className="text-5xl mb-4">📭</div>
-      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <h3 className="font-serif italic text-[22px] text-duke-blue leading-tight">
+        {title}
+      </h3>
       {description && (
-        <p className="mt-2 text-sm text-gray-500 max-w-sm">{description}</p>
+        <p className="mt-2 text-[13px] text-muted max-w-sm leading-relaxed">
+          {description}
+        </p>
       )}
-      {action && <div className="mt-4">{action}</div>}
+      {action && <div className="mt-5">{action}</div>}
     </div>
   )
 }

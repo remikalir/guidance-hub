@@ -1,9 +1,11 @@
+// src/components/items/ItemAdminControls.tsx — Phase 4b: includes cover picker
 "use client"
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { GUIDANCE_TYPES } from "@/lib/utils"
 import type { ItemType } from "@prisma/client"
+import { CoverImagePicker } from "./CoverImagePicker"
 
 interface ItemAdminControlsProps {
   itemId: string
@@ -11,6 +13,8 @@ interface ItemAdminControlsProps {
   published: boolean
   ctlCurated: boolean
   ctlEndorsed: boolean
+  coverImage: string | null
+  coverImageMood: string | null
 }
 
 export function ItemAdminControls({
@@ -19,6 +23,8 @@ export function ItemAdminControls({
   published: initialPublished,
   ctlCurated: initialCurated,
   ctlEndorsed: initialEndorsed,
+  coverImage,
+  coverImageMood,
 }: ItemAdminControlsProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -78,19 +84,27 @@ export function ItemAdminControls({
   }
 
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
-      <h3 className="font-semibold text-gray-900 text-sm mb-1">CTL Staff Controls</h3>
-      <p className="text-xs text-gray-500 mb-4">
-        Actions visible only to Duke CTL staff.
-      </p>
+    <div className="border-t border-rule pt-5 mt-2">
+      <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted mb-1">
+        Staff Tools
+      </h3>
+      <p className="text-[12px] text-muted mb-4">Visible only to CTL staff.</p>
 
-      <div className="space-y-2">
+      {/* Cover image picker */}
+      <CoverImagePicker
+        itemId={itemId}
+        currentCoverImage={coverImage}
+        currentCoverImageMood={coverImageMood}
+      />
+
+      {/* Action buttons */}
+      <div className="space-y-1.5 mt-5">
         {isGuidance ? (
           <button
             type="button"
             onClick={toggleCurate}
             disabled={isPending}
-            className="w-full text-left px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:border-duke-blue hover:text-duke-blue transition-colors disabled:opacity-50"
+            className="w-full text-left px-3 py-2 border border-rule rounded-md text-[12px] text-muted hover:border-duke-blue hover:text-duke-blue transition-colors disabled:opacity-50"
           >
             {ctlCurated ? "Remove CTL Curated status" : "Mark as CTL Curated"}
           </button>
@@ -99,7 +113,7 @@ export function ItemAdminControls({
             type="button"
             onClick={toggleEndorse}
             disabled={isPending}
-            className="w-full text-left px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:border-duke-blue hover:text-duke-blue transition-colors disabled:opacity-50"
+            className="w-full text-left px-3 py-2 border border-rule rounded-md text-[12px] text-muted hover:border-duke-blue hover:text-duke-blue transition-colors disabled:opacity-50"
           >
             {ctlEndorsed ? "Remove CTL Endorsement" : "Mark as CTL Endorsed"}
           </button>
@@ -109,15 +123,13 @@ export function ItemAdminControls({
           type="button"
           onClick={togglePublish}
           disabled={isPending}
-          className="w-full text-left px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:border-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
+          className="w-full text-left px-3 py-2 border border-rule rounded-md text-[12px] text-muted hover:border-red-400 hover:text-red-700 transition-colors disabled:opacity-50"
         >
           {published ? "Unpublish item" : "Republish item"}
         </button>
       </div>
 
-      {error && (
-        <p className="text-xs text-red-600 mt-3">{error}</p>
-      )}
+      {error && <p className="text-[12px] text-red-600 mt-3">{error}</p>}
     </div>
   )
 }
