@@ -85,18 +85,20 @@ model User {
 }
 
 model Item {
-  id           String   @id @default(cuid())
-  title        String
-  description  String   @db.Text
-  type         ItemType
-  authorId     String
-  fileUrl      String?
-  fileKey      String?
-  externalLink String?
+  id             String    @id @default(cuid())
+  title          String
+  description    String    @db.Text
+  type           ItemType
+  authorId       String
+  fileUrl        String?
+  fileKey        String?
+  externalLink   String?
   published      Boolean   @default(true)
   ctlCurated     Boolean   @default(false)
   ctlEndorsed    Boolean   @default(false)
   lastReviewedAt DateTime?
+  coverImage     String?
+  coverImageMood String?
 
   author  User     @relation(fields: [authorId], references: [id])
   tags    Tag[]    @relation("ItemTags")

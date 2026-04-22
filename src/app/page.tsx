@@ -30,7 +30,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   }
 
   if (tagsParam) {
-    const tagNames = tagsParam.split(",").map((t) => t.trim()).filter(Boolean)
+    const tagNames = tagsParam
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean)
     if (tagNames.length > 0) {
       where.tags = { some: { name: { in: tagNames } } }
     }
@@ -58,22 +61,27 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const totalPages = Math.ceil(total / limit)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Hero */}
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-duke-blue mb-2">
-          AI &amp; Education Guidance Hub
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+      {/* Hero — editorial */}
+      <header className="mb-12 max-w-3xl">
+        <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-eno mb-4">
+          A Registry of Academic Innovation
+        </div>
+        <h1 className="font-serif italic text-duke-blue text-5xl sm:text-6xl lg:text-7xl leading-[0.98] tracking-tight mb-5">
+          Browse Duke&rsquo;s collection.
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Discover, share, and review assignments, resources, and tools for responsible AI use — curated by the Duke community.
+        <p className="text-lg text-muted leading-relaxed max-w-2xl">
+          Assignments, resources, and tools for responsible AI use in teaching
+          and learning — contributed by the Duke community, peer reviewed, and
+          curated by the Center for Teaching and Learning.
         </p>
-      </div>
+      </header>
 
       {/* Controls */}
       <BrowseControls currentType={type} currentQ={q} />
 
       {/* Results */}
-      <div className="mt-6">
+      <div className="mt-12">
         {items.length === 0 ? (
           <EmptyState
             title="No items found"
@@ -85,7 +93,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             action={
               <Link
                 href="/items/new"
-                className="inline-flex items-center gap-2 bg-duke-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-duke-blue-dark transition-colors"
+                className="inline-flex items-center gap-2 bg-duke-blue text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-duke-blue-dark transition-colors"
               >
                 Submit an Item
               </Link>
@@ -93,18 +101,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           />
         ) : (
           <>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted mb-8">
               Showing {(page - 1) * limit + 1}–
               {Math.min(page * limit, total)} of {total} items
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-9 gap-y-14">
               {items.map((item) => (
                 <ItemCard key={item.id} item={item} />
               ))}
             </div>
 
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
+              <div className="flex items-center justify-center gap-2 mt-16">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (p) => {
                     const params = new URLSearchParams()
@@ -116,10 +124,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                       <Link
                         key={p}
                         href={`/?${params.toString()}`}
-                        className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                        className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${
                           p === page
                             ? "bg-duke-blue text-white"
-                            : "bg-white border border-gray-200 text-gray-700 hover:border-duke-blue/30 hover:text-duke-blue"
+                            : "bg-white border border-rule text-duke-blue hover:border-duke-blue"
                         }`}
                       >
                         {p}

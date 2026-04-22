@@ -42,7 +42,7 @@ export function BrowseControls({ currentType, currentQ }: BrowseControlsProps) {
       {/* Search */}
       <div className="relative flex-1 max-w-sm">
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -57,23 +57,23 @@ export function BrowseControls({ currentType, currentQ }: BrowseControlsProps) {
         <input
           type="search"
           defaultValue={currentQ}
-          placeholder="Search by title..."
+          placeholder="Search by title…"
           onChange={(e) => update("q", e.target.value)}
-          className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-duke-blue/30 focus:border-duke-blue bg-white"
+          className="w-full pl-10 pr-4 py-2.5 border border-rule rounded-full text-sm text-ink placeholder:text-muted focus:outline-none focus:border-duke-blue bg-white"
         />
       </div>
 
       {/* Type filter */}
-      <div className="flex gap-1.5 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         {TYPES.map((t) => (
           <button
             key={t.value}
             onClick={() => update("type", t.value)}
             className={cn(
-              "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border",
+              "px-4 py-2 rounded-full text-sm font-medium transition-colors border",
               (currentType ?? "") === t.value
                 ? "bg-duke-blue text-white border-duke-blue"
-                : "bg-white text-gray-700 border-gray-200 hover:border-duke-blue/30 hover:text-duke-blue"
+                : "bg-white text-duke-blue border-rule hover:border-duke-blue"
             )}
           >
             {t.label}
